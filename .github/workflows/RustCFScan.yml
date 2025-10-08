@@ -15,9 +15,7 @@ jobs:
     steps:
     - name: 📂 Checkout Repository
       uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        token: ${{ secrets.GIT_TOKEN }}
+      
 
     - name: 🛠️ Install Rust Toolchain
       uses: dtolnay/rust-toolchain@stable
