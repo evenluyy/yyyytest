@@ -1,41 +1,37 @@
-name: CF Proxy scan
+name: ClawCloud 自动登录保活
 
 on:
-  # Workflow dapat dijalankan secara manual
+  schedule:
+    - cron: '0 7 */5 * *'  # UTC 7:00，每5天运行
   workflow_dispatch:
 
-
 jobs:
-  update-proxies:
+  auto-login:
     runs-on: ubuntu-latest
-    name: Scan Proxy
-
+    timeout-minutes: 15
+    
     steps:
-    - name: 📂 Checkout Repository
-      uses: actions/checkout@v3
-      with:
-       token: ${{ secrets.GIT_TOKEN }}
-    
-    - name: 🐍 Set Up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: 检出代码
+        uses: actions/checkout@v4
 
-    - name: 📦 Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        
-    
-    - name: RUN CF Proxy Scan
-      run: |
-        python3 ./SC-Emilia/main.py
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
 
-    #Commit dan push perubahan jika ada
-    - name: 📤 Commit and Push Changes
-      if: ${{ success() }}
-      run: |
-        git config --global user.name "Github Actions"
-        git config --global user.email "actions@github.com"
-        git add .
-        git commit -m " 🔁 Update proxyip"
-        git push origin main --force
+      - name: 安装依赖
+        run: |
+          pip install playwright requests pynacl
+          playwright install chromium
+          playwright install-deps
+
+      - name: 运行自动登录
+        env:
+          GH_USERNAME: ${{ secrets.GH_USERNAMEed }}
+          GH_PASSWORD: ${{ secrets.GH_PASSWORDed }}
+          GH_SESSION: ${{ secrets.GH_SESSION }}
+          TG_BOT_TOKEN: ${{ secrets.GH_BOTTOKEN }}
+          TG_CHAT_ID: ${{ secrets.GH_CHATID }}
+          REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
+          
+        run: python 222.py
